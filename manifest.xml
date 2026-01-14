@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+  xsi:type="MailApp">
+
+  <!-- Begin Basic Settings: Add-in metadata -->
+  <Id>f3b7e8d9-1a2b-4c5d-8e9f-0a1b2c3d4e5f</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Unwired Logic</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Zendesk Integration"/>
+  <Description DefaultValue="Automatically create Zendesk tickets when sending emails from Outlook"/>
+  <IconUrl DefaultValue="https://i.imgur.com/3UjGmxJ.png"/>
+  <HighResolutionIconUrl DefaultValue="https://i.imgur.com/lxvBK1A.png"/>
+  <SupportUrl DefaultValue="https://www.contoso.com/help"/>
+
+  <!-- Hosts -->
+  <Hosts>
+    <Host Name="Mailbox"/>
+  </Hosts>
+
+  <Requirements>
+    <Sets>
+      <Set Name="Mailbox" MinVersion="1.10"/>
+    </Sets>
+  </Requirements>
+
+  <!-- Form Settings -->
+  <FormSettings>
+    <Form xsi:type="ItemEdit">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="https://unwiredlogickk.github.io/outlook-zendesk-addon/taskpane.html"/>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
+
+  <!-- Permissions -->
+  <Permissions>ReadWriteMailbox</Permissions>
+
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/>
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
+  </Rule>
+
+  <DisableEntityHighlighting>false</DisableEntityHighlighting>
+
+  <!-- Version Overrides -->
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
+
+      <Requirements>
+        <bt:Sets DefaultMinVersion="1.10">
+          <bt:Set Name="Mailbox"/>
+        </bt:Sets>
+      </Requirements>
+
+      <Hosts>
+        <Host xsi:type="MailHost">
+
+          <!-- Runtimes for event-based activation -->
+          <Runtimes>
+            <Runtime resid="Commands.Url">
+              <Override type="javascript" resid="Commands.Url"/>
+            </Runtime>
+          </Runtimes>
+
+          <!-- Event-based activation -->
+          <DesktopFormFactor>
+            <!-- Location of the Functions file -->
+            <FunctionFile resid="Commands.Url"/>
+
+            <!-- Task pane for settings -->
+            <ExtensionPoint xsi:type="MessageComposeCommandSurface">
+              <OfficeTab id="TabDefault">
+                <Group id="msgComposeGroup">
+                  <Label resid="GroupLabel"/>
+                  <Control xsi:type="Button" id="msgComposeOpenPaneButton">
+                    <Label resid="TaskpaneButton.Label"/>
+                    <Supertip>
+                      <Title resid="TaskpaneButton.Label"/>
+                      <Description resid="TaskpaneButton.Tooltip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16x16"/>
+                      <bt:Image size="32" resid="Icon.32x32"/>
+                      <bt:Image size="80" resid="Icon.80x80"/>
+                    </Icon>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="Taskpane.Url"/>
+                    </Action>
+                  </Control>
+                  <Control xsi:type="Button" id="toggleZendeskButton">
+                    <Label resid="ToggleButton.Label"/>
+                    <Supertip>
+                      <Title resid="ToggleButton.Label"/>
+                      <Description resid="ToggleButton.Tooltip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16x16"/>
+                      <bt:Image size="32" resid="Icon.32x32"/>
+                      <bt:Image size="80" resid="Icon.80x80"/>
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>toggleZendesk</FunctionName>
+                    </Action>
+                  </Control>
+                </Group>
+              </OfficeTab>
+            </ExtensionPoint>
+
+            <!-- Configure OnMessageSend event -->
+            <ExtensionPoint xsi:type="LaunchEvent">
+              <LaunchEvents>
+                <LaunchEvent Type="OnMessageSend" FunctionName="onMessageSend" SendMode="SoftBlock"/>
+              </LaunchEvents>
+              <SourceLocation resid="Commands.Url"/>
+            </ExtensionPoint>
+
+          </DesktopFormFactor>
+        </Host>
+      </Hosts>
+
+      <!-- Resources -->
+      <Resources>
+        <bt:Images>
+          <bt:Image id="Icon.16x16" DefaultValue="https://i.imgur.com/Ry87mon.png"/>
+          <bt:Image id="Icon.32x32" DefaultValue="https://i.imgur.com/3UjGmxJ.png"/>
+          <bt:Image id="Icon.80x80" DefaultValue="https://i.imgur.com/TLHHJUJ.png"/>
+        </bt:Images>
+        <bt:Urls>
+          <bt:Url id="Commands.Url" DefaultValue="https://unwiredlogickk.github.io/outlook-zendesk-addon/commands.html"/>
+          <bt:Url id="Taskpane.Url" DefaultValue="https://unwiredlogickk.github.io/outlook-zendesk-addon/taskpane.html"/>
+        </bt:Urls>
+        <bt:ShortStrings>
+          <bt:String id="GroupLabel" DefaultValue="Zendesk"/>
+          <bt:String id="TaskpaneButton.Label" DefaultValue="Configure Zendesk"/>
+          <bt:String id="ToggleButton.Label" DefaultValue="Toggle Zendesk"/>
+        </bt:ShortStrings>
+        <bt:LongStrings>
+          <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Open Zendesk configuration panel"/>
+          <bt:String id="ToggleButton.Tooltip" DefaultValue="Quickly enable or disable automatic ticket creation"/>
+        </bt:LongStrings>
+      </Resources>
+
+    </VersionOverrides>
+  </VersionOverrides>
+
+</OfficeApp>
